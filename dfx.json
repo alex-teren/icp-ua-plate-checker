@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "ua-plate-checker-backend": {
+      "main": "src/ua-plate-checker-backend/main.mo",
+      "type": "motoko"
+    },
+    "ua-plate-checker-frontend": {
+      "dependencies": [
+        "ua-plate-checker-backend"
+      ],
+      "source": [
+        "src/ua-plate-checker-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "ua-plate-checker-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
