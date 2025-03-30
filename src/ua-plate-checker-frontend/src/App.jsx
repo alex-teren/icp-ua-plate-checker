@@ -55,7 +55,9 @@ function App() {
     return data;
   };
 
-  const handleCheck = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!/^\d{4}$/.test(plate)) {
       setError("Будь ласка, введіть рівно 4 цифри");
       return;
@@ -87,40 +89,41 @@ function App() {
   };
 
   return (
-    <div className="flex w-full h-full justify-center">
-      <div className="flex flex-col gap-5 w-[500px] max-w-full py-10 px-6">
-        <div className="flex gap-4">
+    <div className="flex w-full justify-center">
+      <div className="flex flex-col gap-5 w-[600px] max-w-full py-10 px-6">
+        <h1 className="text-2xl font-semibold">Перевірка доступних номерних знаків для авто у всіх регіонах України</h1>
+        <form className="flex gap-4" onSubmit={handleSubmit}>
           <input
             value={plate}
             onChange={handleChange}
             className={`border rounded p-2 px-4 grow ${
               error ? "border-red-500" : ""
             }`}
-            placeholder="Введіть 4 цифри номера"
+            placeholder="Введіть 4 цифри бажаної комбінації"
             maxLength={4}
           />
 
           <button
-            onClick={handleCheck}
+            type="submit"
             disabled={isChecking || plate.length !== 4}
             className="bg-blue-500 shrink text-white py-2 px-6 whitespace-nowrap rounded disabled:bg-gray-300"
           >
             {isChecking ? "Перевірка..." : "Перевірити"}
           </button>
-        </div>
+        </form>
 
         {error && <div className="text-red-500 mb-2">{error}</div>}
 
         <div className="mt-4">
           {results.map((r, idx) => (
-            <div key={idx}>
+            <div className="mb-4" key={idx}>
               {regionsDict[r.region]}:{" "}
               <span
                 className={
-                  r.result.includes(plate) ? "text-green-500" : "text-red-500"
+                  r.result?.includes(plate) ? "text-green-500" : "text-red-500"
                 }
               >
-                {r.result.includes(plate) ? "Доступний ✅" : "НЕ доступний ❌"}
+                {r.result?.includes(plate) ? "Доступний ✅" : "НЕ доступний ❌"}
               </span>
             </div>
           ))}
