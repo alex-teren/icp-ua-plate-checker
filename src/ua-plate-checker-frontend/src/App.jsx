@@ -2,70 +2,129 @@
 import { useState } from "react";
 import "./App.css";
 
+const regionsDict = {
+  1: "АР Крим",
+  2: "Вінницька",
+  3: "Волинська",
+  4: "Дніпропетровська",
+  5: "Донецька",
+  6: "Житомирська",
+  7: "Закарпатська",
+  8: "Запорізька",
+  9: "Івано-Франківська",
+  10: "Київська",
+  11: "Кіровоградська",
+  12: "Луганська",
+  13: "Львівська",
+  14: "Миколаївська",
+  15: "Одеська",
+  16: "Полтавська",
+  17: "Рівненська",
+  18: "Сумська",
+  19: "Тернопільська",
+  20: "Харківська",
+  21: "Херсонська",
+  22: "Хмельницька",
+  23: "Черкаська",
+  24: "Чернівецька",
+  25: "Чернігівська",
+  26: "м. Київ",
+};
+
 function App() {
-  const [number, setNumber] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [plate, setPlate] = useState("");
   const [results, setResults] = useState([]);
-  const [error, setError] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!number.trim()) return;
-    setLoading(true);
-    setResults([]);
-    setError(null);
-
-    try {
-      const res = await fetch("https://your-heroku-api.com/check", {
+  const checkRegion = async (regionId) => {
+    const response = await fetch(
+      "https://ua-plate-checker-api-237f2e397c5e.herokuapp.com/check",
+      {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ plate: number }),
-      });
-      if (!res.ok) throw new Error("Server error");
-      const data = await res.json();
-      setResults(data);
-    } catch (err) {
-      setError("Помилка при перевірці номеру. Спробуйте пізніше.");
-    } finally {
-      setLoading(false);
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plate, region: regionId }),
+      }
+    );
+
+    if (!response.ok) {
+      return { regionId, error: "Error checking region" };
+    }
+
+    const data = await response.json();
+    return data;
+  };
+
+  const handleCheck = async () => {
+    if (!/^\d{4}$/.test(plate)) {
+      setError("Будь ласка, введіть рівно 4 цифри");
+      return;
+    }
+
+    setError("");
+    setIsChecking(true);
+    setResults([]);
+
+    for (let regionId = 1; regionId <= 26; regionId++) {
+      const result = await checkRegion(regionId);
+      setResults((prev) => [...prev, result]);
+
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+
+    setIsChecking(false);
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+
+    if (value === "" || /^\d{0,4}$/.test(value)) {
+      setPlate(value);
+      setError("");
+    } else {
+      setError("Дозволено вводити тільки цифри (макс. 4)");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <div className="bg-white p-6 rounded-2xl shadow-xl max-w-xl w-full">
-        <h1 className="text-2xl font-bold mb-4 text-center">Перевірка доступності номеру для авто</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
+    <div className="flex w-full h-full justify-center">
+      <div className="flex flex-col gap-5 w-[500px] max-w-full py-10 px-6">
+        <div className="flex gap-4">
           <input
-            type="text"
-            placeholder="Введіть номер (наприклад, 1337)"
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-            className="border border-gray-300 px-4 py-3 rounded w-full"
+            value={plate}
+            onChange={handleChange}
+            className={`border rounded p-2 px-4 grow ${
+              error ? "border-red-500" : ""
+            }`}
+            placeholder="Введіть 4 цифри номера"
+            maxLength={4}
           />
+
           <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-xl transition"
+            onClick={handleCheck}
+            disabled={isChecking || plate.length !== 4}
+            className="bg-blue-500 shrink text-white py-2 px-6 whitespace-nowrap rounded disabled:bg-gray-300"
           >
-            {loading ? "Перевіряю..." : "Перевірити"}
+            {isChecking ? "Перевірка..." : "Перевірити"}
           </button>
-        </form>
+        </div>
 
-        {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
+        {error && <div className="text-red-500 mb-2">{error}</div>}
 
-        <ul className="mt-6 space-y-2">
-          {results.map((res, index) => (
-            <li
-              key={index}
-              className={`p-3 rounded-xl shadow text-white ${res.status === "available" ? "bg-green-600" : "bg-red-600"}`}
-            >
-              {res.region}: {res.message}
-            </li>
+        <div className="mt-4">
+          {results.map((r, idx) => (
+            <div key={idx}>
+              {regionsDict[r.region]}:{" "}
+              <span
+                className={
+                  r.result.includes(plate) ? "text-green-500" : "text-red-500"
+                }
+              >
+                {r.result.includes(plate) ? "Доступний ✅" : "НЕ доступний ❌"}
+              </span>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
