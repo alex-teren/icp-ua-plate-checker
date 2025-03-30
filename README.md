@@ -2,12 +2,16 @@
 
 Simple, intuitive, and clean frontend application built with React and Tailwind CSS for checking the availability of Ukrainian vehicle license plates. Integrated with a backend deployed on Heroku and hosted on the Internet Computer (ICP) via a canister.
 
+👉 **Live ICP Deployment:**  
+🔗 https://lfaoq-haaaa-aaaah-arcva-cai.icp0.io/
+
 ## 🚀 Features
 
 - ✅ Simple, responsive UI built with React
 - ✅ Styling with Tailwind CSS
 - ✅ Integration with ICP via DFX
 - ✅ Backend API integration (Heroku)
+- ✅ Deployed as a frontend canister on the Internet Computer
 
 ## 🛠️ Technologies Used
 
@@ -60,3 +64,10 @@ This frontend app connects to the backend API deployed on Heroku:
 👉 [icp-ua-plate-checker-api](https://github.com/alex-teren/icp-ua-plate-checker-api)
 
 
+## ❓ Why is the backend hosted on Heroku instead of in a canister?
+
+The backend relies on Puppeteer — a Node.js library for controlling headless Chromium to scrape or interact with web pages.
+
+📌 **At the moment, ICP canisters do not support running Puppeteer or similar tools** due to the limitations of the WebAssembly runtime environment.
+
+👉 For this reason, the license plate checking logic is implemented in a separate Node.js API hosted on Heroku.
