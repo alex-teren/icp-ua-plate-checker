@@ -91,7 +91,9 @@ function App() {
   return (
     <div className="flex w-full justify-center">
       <div className="flex flex-col gap-5 w-[600px] max-w-full py-10 px-6">
-        <h1 className="text-2xl font-semibold">Перевірка доступних номерних знаків для авто у всіх регіонах України</h1>
+        <h1 className="text-2xl font-semibold">
+          Перевірка доступних номерних знаків для авто у всіх регіонах України
+        </h1>
         <form className="flex gap-4" onSubmit={handleSubmit}>
           <input
             value={plate}
@@ -123,8 +125,15 @@ function App() {
                   r.result?.includes(plate) ? "text-green-500" : "text-red-500"
                 }
               >
-                {r.result?.includes(plate) ? "Доступний ✅" : "НЕ доступний ❌"}
+                {r.result?.includes(plate) ? "Доступний ✅" : "Недоступний ❌"}
               </span>
+              {r.resultTable && (
+                <div className="result-table-wrapper">
+                  <h2 className="h2 text-xl font-semibold mt-6 mb-3">Повна таблиця доступних номерів:</h2>
+                  <table className="w-100" dangerouslySetInnerHTML={{ __html: r.resultTable }}></table>
+                </div>
+              )}
+              <hr className="h-px my-4 bg-gray-200 border-0"></hr>
             </div>
           ))}
         </div>

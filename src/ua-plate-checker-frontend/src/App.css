@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.result-table-wrapper th {
+  width: 33.33% !important;
+  text-align: left !important;
+  border: 1px solid lightgray;
+}
+.result-table-wrapper th, .result-table-wrapper td {
+  padding: 10px;
+  border: 1px solid lightgray;
+}
